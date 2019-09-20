@@ -8,7 +8,7 @@
 # - svy  survey data frame
 # - pop  population distribution list
 # - print_name  header to print in summary (useful for log output)
-# - sguid  name of varible that holds unique id
+# - idvar  name of varible that holds unique id
 est_wts <- function(
     svy, pop, print_name = "", idvar = "sguid"
 ) {
