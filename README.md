@@ -28,7 +28,7 @@ sink()
 
 ## Data Notes
 
-- Both anglers and hunter scripts weight separately based on the Tablecat variable (4 categories).
+- Both anglers and hunter scripts weight separately based on the Tablecat variable (4 categories). The R approach uses split > apply > combine to run over these categories.
 - Target population is defined by the 2016 usfws national survey.
 - Adapted from Tom's code stored in the "spss_code" folder.
 - Angler survey includes missing values for fish_avidity. The rake_wt was set to missing for these records.
