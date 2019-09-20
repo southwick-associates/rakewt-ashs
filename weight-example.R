@@ -1,4 +1,4 @@
-# run rake weighting for hunters
+# rake weighting example
 
 library(anesrake)
 library(weights)
