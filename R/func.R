@@ -9,11 +9,12 @@
 # - pop  population distribution list
 # - print_name  header to print in summary (useful for log output)
 # - idvar  name of varible that holds unique id
+# - cap  cap argument of anesrake()
 est_wts <- function(
-    svy, pop, print_name = "", idvar = "sguid"
+    svy, pop, print_name = "", idvar = "sguid", cap = 20
 ) {
     # run weighting
-    wts <- anesrake(pop, svy, caseid = svy[[idvar]], force1 = TRUE, cap = 100)
+    wts <- anesrake(pop, svy, caseid = svy[[idvar]], force1 = TRUE, cap = cap)
     
     # print summary
     cat("\nWeight Summary for", print_name, "-----------------------------\n\n")
