@@ -22,20 +22,24 @@ svy <- data.frame(haven::read_sav(svy_file))
 # check: overall distributions of weighting variables
 sapply(names(pop), function(x) weights::wpct(svy[[x]]))
 
-# weights will be run separately by Tablecat
+# split into a list: weights will be run separately by Tablecat
 svy <- split(svy, svy$TableCat)
 
 # check: make sure ID is unique (should all show TRUE)
 lapply(svy, function(x) length(unique(x$sguid)) == nrow(x))
 
-# remove duplicate records
+# check: duplicate record
+dups <- duplicated(svy[[2]])
+svy[[2]][dups, ]
+
+# filter: remove duplicate record
 svy <- lapply(svy, unique)
-lapply(svy, function(x) length(unique(x$sguid)) == nrow(x))
 
 # Run Weighting -----------------------------------------------------------
 
-svy_wt <- lapply(seq_along(svy), function(i) est_wts(svy[[i]], pop, names(svy)[[i]]))
+svy_wt <- list()
+for (i in names(svy)) svy_wt[[i]] <- est_wts(svy[[i]], pop, i)
 svy_wt <- do.call(rbind, svy_wt)
-
+    
 # save
 write.csv(svy_wt, out_file, row.names = FALSE, na = "")

@@ -23,7 +23,7 @@ svy <- data.frame(haven::read_sav(svy_file))
 # check: overall distributions of weighting variables
 sapply(names(pop), function(x) weights::wpct(svy[[x]]))
 
-# weights will be run separately by Tablecat
+# split into a list: weights will be run separately by Tablecat
 svy <- split(svy, svy$TableCat)
 
 # check: make sure ID is unique (should all show TRUE)
@@ -31,18 +31,18 @@ lapply(svy, function(x) length(unique(x$sguid)) == nrow(x))
 
 # Run Weighting -----------------------------------------------------------
 
-# apply a filter prior to weighting
-# - records with zero values for fish avidity won't compute rake_wt (it will be missing)
-x <- lapply(svy, function(x) x[x$fish_avidity != 0,])
-
-# apply weighting by TableCat
-svy_wt <- lapply(seq_along(x), function(i) est_wts(x[[i]], pop, names(x)[[i]]))
-svy_wt <- lapply(svy_wt, function(x) x[c("sguid", "rake_wt")])
-
-# merge back with unfiltered survey data
-svy_wt <- mapply(merge, svy, svy_wt, MoreArgs = list(by = "sguid", all.x = TRUE),
-                 SIMPLIFY = FALSE)
-svy_wt <- do.call(rbind, svy_wt)
+svy_wt <- list()
+for (i in names(svy)) {
+    # filter: records with fish_avidity equal to missing or zero won't get weighted
+    x <- svy[[i]]
+    x <- x[x$fish_avidity != 0, ]
+    
+    # estimate weights for filtered rows & join back to all rows
+    x <- est_wts(x, pop, i)
+    x <- x[c("sguid", "rake_wt")]
+    svy_wt[[i]] <- merge(svy[[i]], x, by = "sguid", all.x = TRUE)
+}
+svy_wt <- do.call(rbind, svy_wt) 
 
 # save
 write.csv(svy_wt, out_file, row.names = FALSE, na = "")
