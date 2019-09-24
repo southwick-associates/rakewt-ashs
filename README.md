@@ -30,9 +30,8 @@ sink()
 
 - Target population is defined by the 2016 usfws national survey.
 - One duplicate record was removed from the hunting survey dataset.
-- Angler survey includes a decent percentage of zero (and missing) values for fish_avidity:
-    + The `anesrake()` procedure cannot account for zero values since that category is not included in the target population.
-    + Normally `anesrake()` will still calculate weight when missing values in target categories are present. In this case, rake_wt was set to missing for missing values in fish_avidity. 
+- Angler survey includes a decent percentage of zero (and missing) values for fish_avidity. An additional filter step was added to ensure these records were given a missing value for the output rake weight (i.e., not included in weighting). 
+    + Note that `anesrake()` will still calculate weights for records that include missing values in other target categories (income, etc.).
 - Both angler and hunter scripts weight separately based on the Tablecat variable (4 categories). 
     + Iterating over TableCat was done using R's [for loops](https://www.datacamp.com/community/tutorials/tutorial-on-loops-in-r) and [apply functions](https://www.datacamp.com/community/tutorials/r-tutorial-apply-family).
     
