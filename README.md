@@ -1,7 +1,7 @@
 
 # Rake Weighting for Angler/Hunter Survey
 
-Includes code for rake weighting in R in Sep 2019. Takes input survey ("data" folder) and returns weighted survey data in the "out" folder. Relies primarily on R [package anesrake](https://cran.r-project.org/web/packages/anesrake/index.html)
+Includes code for rake weighting in R in Sep 2019. Takes input survey ("data" folder) and returns weighted survey data in the "out" folder. The code relies primarily on R [package anesrake](https://cran.r-project.org/web/packages/anesrake/index.html). The R code was adapted from Tom's SPSS code ("spss_code" folder).
 
 ## Installation
 
@@ -28,7 +28,11 @@ sink()
 
 ## Data Notes
 
-- Both anglers and hunter scripts weight separately based on the Tablecat variable (4 categories). The R approach uses split > apply > combine to run over these categories.
+
 - Target population is defined by the 2016 usfws national survey.
-- Adapted from Tom's code stored in the "spss_code" folder.
-- Angler survey includes missing values for fish_avidity. The rake_wt was set to missing for these records.
+- Angler survey includes a decent percentage of zero (and missing) values for fish_avidity:
+    + The `anesrake()` procedure cannot account for zero values since that category is not included in the target population
+    + Normally `anesrake()` will still calculate weight when missing values in target categories are present. In this case, rake_wt was set to missing for missing values in fish_avidity. 
+- Both angler and hunter scripts weight separately based on the Tablecat variable (4 categories). 
+    + I used R's [apply functions](https://www.datacamp.com/community/tutorials/r-tutorial-apply-family) to iterate over categories.
+    

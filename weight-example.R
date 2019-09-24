@@ -14,7 +14,7 @@ pop <- list(
 
 # load survey data
 svy <- haven::read_sav("data/TOBEWEIGHTED_HS_TC1234_9.18.2019.sav")
-svy <- data.frame(svy) # anesrake won't work with haven's tbl_df class
+svy <- data.frame(svy) # anesrake() won't work with haven's tbl_df class
 
 # filter rows: use one category for this example
 svy <- svy[svy$TableCat == 1,]
@@ -22,7 +22,7 @@ svy <- svy[svy$TableCat == 1,]
 # check: distributions of weighting variables
 sapply(names(pop), function(x) weights::wpct(svy[[x]]))
 
-# check: make sure ID is unique (should all show TRUE)
+# check: make sure ID is unique (should show TRUE)
 length(unique(svy$sguid)) == nrow(svy)
 
 # run weighting
