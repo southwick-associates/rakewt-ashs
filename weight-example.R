@@ -6,6 +6,8 @@ library(haven)
 source("R/func.R") # est_wts()
 
 # population distributions - 2016 usfws national survey, hunters
+# - if using a reference dataset for population (e.g., license data), use:
+#   pop <- sapply(variable_names, function(x) weights::wpct(dataset[[x]]))
 pop <- list(
     region = c("1" = 0.1802, "2" = 0.1985, "3" = 0.0939, "4" = 0.2043, "5" = 0.2222, "6" = 0.101),
     agex2 = c("1" = 0.264, "2" = 0.362, "3" = 0.374),
