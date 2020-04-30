@@ -29,9 +29,10 @@ fac_mac (avidity)
 ```
 
 
-##For weighting schemes that use varied targets (this project weights each segment w/i ASA-19-01 individually):
-###read in a csv with the distribution for each segment. 
-###Create lists containing the weighting targets. Each segment (of 7 total) will have a list which will be used for weighting. 
+For weighting schemes that use varied targets (this project weights each segment w/i ASA-19-01 individually):
+#read in a csv with the distribution for each segment. 
+#Create lists containing the weighting targets. Each segment (of 7 total) will have a list which will be used for weighting. 
+#In this example, the population distribution data are entered in a table, with the two female values (0 and 1) occupying the first and second row, as shown in the [brackets]. Segment values are stored in columns - this is why the 'seg' value in the macro are toggling over in the table. 
 ```{r}
 raw_dist <- read.csv("C:/Users/Patrick/Southwick Associates/ASA - ASA-19-01 Developing Angler Personas/Work files/Data & Syntax/Final Data Sets/Dist_for_Wts.csv", row.names=1)
 Dist_for_Wts <- (raw_dist/100)
