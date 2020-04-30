@@ -1,0 +1,90 @@
+#This code can be used to apply rake weights iteratively to a data set containing multiple groups (i.e. 4 table cats in AS & HS).
+#Weights will be applied to each data subset independently. This can be done using unique weighting targets for each segment (demonstrated here), or identical weighting targets (not demonstrated). 
+
+#For simplified rake weighting procedures, see Dan's git 'rakewt-ashs/weight-example.R'
+
+
+##Load packages and data
+```{r}
+library(anesrake)
+library(weights)
+library(haven)
+library(gtools)
+
+data <- read.csv("C:/Users/Patrick/Southwick Associates/ASA - ASA-19-01 Developing Angler Personas/Work files/Data & Syntax/binary_data_final.csv")
+```
+
+##If variables are not factors, ensure that they're converted into factors. 
+###The following macro will accomplish this for the 4 dimensions on which we'll rake weight. 
+```{r}
+fac_mac <- defmacro(var, expr={
+  data$var <- as.factor(data$var)
+  }
+)
+
+fac_mac (Region)
+fac_mac (female)
+fac_mac (AgeCat)
+fac_mac (avidity)
+```
+
+
+##For weighting schemes that use varied targets (this project weights each segment w/i ASA-19-01 individually):
+###read in a csv with the distribution for each segment. 
+###Create lists containing the weighting targets. Each segment (of 7 total) will have a list which will be used for weighting. 
+```{r}
+raw_dist <- read.csv("C:/Users/Patrick/Southwick Associates/ASA - ASA-19-01 Developing Angler Personas/Work files/Data & Syntax/Final Data Sets/Dist_for_Wts.csv", row.names=1)
+Dist_for_Wts <- (raw_dist/100)
+
+pop_mac <- defmacro(seg, new_list, expr={
+  new_list <- list(
+      female = c("0" = Dist_for_Wts[1, seg], "1" = Dist_for_Wts[2, seg]), 
+      AgeCat = c("0" = Dist_for_Wts[3, seg], "1" = Dist_for_Wts[4, seg], "2" = Dist_for_Wts[5, seg]), 
+      avidity = c("0" = Dist_for_Wts[6, seg], "1" = Dist_for_Wts[7, seg], "2" = Dist_for_Wts[8, seg], 
+                  "3" = Dist_for_Wts[9, seg], "4" = Dist_for_Wts[10, seg], "5" = Dist_for_Wts[11, seg]),
+      Region = c("1" = Dist_for_Wts[12, seg], "2" = Dist_for_Wts[13, seg], "3" = Dist_for_Wts[14, seg], 
+                 "4" = Dist_for_Wts[15, seg]))
+
+      new_list$female <- new_list$female/sum(new_list$female)
+      new_list$AgeCat <- new_list$AgeCat/sum(new_list$AgeCat)
+      new_list$avidity <- new_list$avidity/sum(new_list$avidity)
+      new_list$Region <- new_list$Region/sum(new_list$Region)
+
+})
+
+pop_mac (1, seg1)
+pop_mac (2, seg2)
+pop_mac (3, seg3)
+pop_mac (4, seg4)
+pop_mac (5, seg5)
+pop_mac (6, seg6)
+pop_mac (7, seg7)
+```
+
+##The following function will subset the data into segments and apply rake weights to each segment. 
+##This will result in 7 different data sets, which are summarized and bound back together with rbind on the last line. 
+```{r}
+seg_est_wts <- function(seg, pop, print_name = "", idvar = "Unique", cap = 100){
+    data <- subset(data, data$cluster==seg)
+    wts <- anesrake(pop, data, caseid = data[[idvar]], force1 = TRUE, cap = cap)
+    data$rake_wt <- wts$weightvec
+    data
+}
+seg1_wtd <- seg_est_wts(1, seg1)
+seg2_wtd <- seg_est_wts(2, seg2)
+seg3_wtd <- seg_est_wts(3, seg3)
+seg4_wtd <- seg_est_wts(4, seg4)
+seg5_wtd <- seg_est_wts(5, seg5)
+seg6_wtd <- seg_est_wts(6, seg6)
+seg7_wtd <- seg_est_wts(7, seg7)
+
+print(summary(seg1_wtd$rake_wt))
+print(summary(seg2_wtd$rake_wt))
+print(summary(seg3_wtd$rake_wt))
+print(summary(seg4_wtd$rake_wt))
+print(summary(seg5_wtd$rake_wt))
+print(summary(seg6_wtd$rake_wt))
+print(summary(seg7_wtd$rake_wt))
+
+data_wtd <- rbind(seg1_wtd, seg2_wtd, seg3_wtd, seg4_wtd, seg5_wtd, seg6_wtd, seg7_wtd)
+```
